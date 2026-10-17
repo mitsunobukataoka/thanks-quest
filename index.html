@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>サンクスクエスト - Thanks Quest</title>
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -20,12 +18,33 @@
         }
 
         .game-screen-bg {
-            background: linear-gradient(to bottom, rgba(11, 9, 20, 0.45), rgba(11, 9, 20, 0.85)), url('bg_title.jpg') center/cover no-repeat;
+            background: linear-gradient(to bottom, rgba(11, 9, 20, 0.75), rgba(11, 9, 20, 0.95)), radial-gradient(circle at center, #2a1b4e 0%, #0b0914 100%);
             border-radius: 16px;
             padding: 1.5rem;
             box-shadow: 0 0 35px rgba(0, 0, 0, 0.9);
             border: 1px solid rgba(212, 175, 55, 0.5);
             backdrop-filter: blur(2px);
+        }
+
+        .card-visual-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-col: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1f1a3a 0%, #0d0a1a 100%);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-visual-placeholder::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
         }
 
         .fantasy-font {
@@ -163,19 +182,19 @@
             0% {
                 width: 0px;
                 height: 0px;
-                opacity: 0.8;
-                background: radial-gradient(circle, rgba(200, 160, 90, 0.6) 0%, rgba(120, 95, 45, 0.3) 50%, rgba(0, 0, 0, 0) 70%);
-                box-shadow: 0 0 30px rgba(180, 140, 70, 0.4);
+                opacity: 0.9;
+                background: radial-gradient(circle, rgba(254, 240, 138, 0.9) 0%, rgba(212, 175, 55, 0.4) 50%, rgba(0, 0, 0, 0) 70%);
+                box-shadow: 0 0 50px rgba(254, 240, 138, 0.8);
             }
             50% {
-                opacity: 0.7;
+                opacity: 0.85;
             }
             100% {
                 width: 1400px;
                 height: 1400px;
                 opacity: 0;
-                background: radial-gradient(circle, rgba(140, 110, 50, 0.4) 0%, rgba(80, 60, 30, 0.15) 60%, rgba(0, 0, 0, 0) 100%);
-                box-shadow: 0 0 60px rgba(140, 110, 50, 0.3);
+                background: radial-gradient(circle, rgba(212, 175, 55, 0.6) 0%, rgba(180, 120, 20, 0.2) 60%, rgba(0, 0, 0, 0) 100%);
+                box-shadow: 0 0 120px rgba(212, 175, 55, 0.6);
             }
         }
 
@@ -364,7 +383,7 @@
                 </button>
             </div>
 
-            <div id="cards-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 max-h-[60vh] overflow-y-auto p-1"></div>
+            <div id="cards-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 max-h-[60vh] overflow-y-auto p-1 pb-16"></div>
         </div>
 
     </main>
@@ -374,7 +393,7 @@
         <div class="fantasy-panel max-w-lg w-full p-6 text-center space-y-5 relative" onclick="event.stopPropagation()">
             <div class="space-y-1">
                 <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">VICTORY</span>
-                <h3 class="text-2xl md:text-3xl font-black text-amber-300">魔王浄化完了！</h3>
+                <h3 class="text-2xl md:text-3xl font-black text-amber-300">魔王討伐完了！</h3>
             </div>
             
             <div class="bg-black/60 p-4 rounded-xl border border-amber-500/30 text-left space-y-3">
@@ -398,6 +417,21 @@
                 <span>🎁</span>
                 <span>カードガチャへ進む</span>
             </button>
+        </div>
+    </div>
+
+    <!-- GAME OVER MODAL -->
+    <div id="gameover-modal" class="fixed inset-0 bg-black/85 z-50 hidden flex items-center justify-center p-4">
+        <div class="fantasy-panel max-w-lg w-full p-6 text-center space-y-5 border-red-700/70">
+            <div class="space-y-2">
+                <span class="text-xs font-bold text-red-400 uppercase tracking-widest">GAME OVER</span>
+                <h3 class="text-2xl md:text-3xl font-black text-red-400">勇者は力尽きた……</h3>
+                <p class="text-sm text-gray-300">魔王の反撃により、勇者ブレイブのHPが0になった！</p>
+            </div>
+            <div class="bg-black/60 p-4 rounded-xl border border-red-500/30 text-sm text-gray-300 leading-relaxed">
+                今回は魔王討伐失敗。気持ちを立て直して、もう一度挑戦しよう！
+            </div>
+            <button onclick="closeGameOver()" class="w-full fantasy-btn py-3.5 rounded-xl font-bold text-base">タイトルへ戻る</button>
         </div>
     </div>
 
@@ -477,7 +511,7 @@
             "コリドラス・アネウス", "コリドラス・パレアトス", "レッドワグプラティ", "グローライトテトラ", "ゼブラダニオ",
             "バルーンモーリー", "ブラックネオンテトラ", "レッドファントムテトラ", "コリドラス・ピグミー", "プリステラ",
             "スマトラ", "ブラックファントムテトラ", "レモンテトラ", "ソードテール", "ペンギンテトラ",
-            "ルリスズメダイ", "ピグミーグラミー", "シルバーチップ・テトラ", "オトシンネグロ", "ハマクマノミ",
+            "ルリスズメダイ", "ピグミーグラミー", "シルバーチップ・テトラ", "ロイヤルグラマ", "オトシンネグロ", "ハマクマノミ",
             "トーマシー", "ピラニア・ナッテリー", "ハタタテダイ", "グラスフィッシュ", "ブルーグラミー",
             "ドワーフボーシャ", "チョコレートグラミー", "フロントーサ", "クダゴンベ", "テトラオーロ",
             "ホワイトネオンテトラ", "バジス・バジス", "ニチリンダテハゼ", "ブラックゴースト", "ミスジチョウチョウウオ",
@@ -496,6 +530,16 @@
 
             return { id: id, name: name, rarity: rarityStars, img: `fish_${id}.jpg` };
         });
+
+        function getFishCardSvg(fish) {
+            const colors = ['#f59e0b', '#3b82f6', '#ec4899', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4'];
+            const color = colors[(fish.id - 1) % colors.length];
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="420" viewBox="0 0 300 420"><rect width="300" height="420" rx="16" fill="%230f0c1b"/><rect x="10" y="10" width="280" height="400" rx="12" fill="none" stroke="%23d4af37" stroke-width="2"/><circle cx="150" cy="160" r="80" fill="${encodeURIComponent(color)}" opacity="0.2"/><path d="M110 160 Q150 110 190 160 Q150 210 110 160 Z" fill="${encodeURIComponent(color)}"/><circle cx="170" cy="150" r="6" fill="%23ffffff"/><text x="150" y="280" font-family="sans-serif" font-weight="bold" font-size="20" fill="%23fef08a" text-anchor="middle">No.${fish.id} ${encodeURIComponent(fish.name)}</text><text x="150" y="315" font-family="sans-serif" font-size="16" fill="%23fbbf24" text-anchor="middle">${encodeURIComponent(fish.rarity)}</text></svg>`;
+        }
+
+        function getMaouSvg(maou) {
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="%23ef4444" opacity="0.2"/><polygon points="100,30 130,80 180,90 140,130 150,180 100,150 50,180 60,130 20,90 70,80" fill="%23dc2626"/><text x="100" y="105" font-family="sans-serif" font-weight="bold" font-size="16" fill="%23ffffff" text-anchor="middle">👿 ${encodeURIComponent(maou.name)}</text></svg>`;
+        }
 
         function initAudio() {
             if (!audioCtx) {
@@ -533,6 +577,13 @@
             if (!audioEnabled) return;
             if (type === 'click') playTone('sine', 440, 880, 0.08, 0.1);
             else if (type === 'attack') playTone('triangle', 150, 40, 0.2, 0.3);
+            else if (type === 'hit_correct') {
+                playTone('triangle', 300, 800, 0.15, 0.3);
+                setTimeout(() => playTone('sine', 600, 1200, 0.25, 0.4), 100);
+            }
+            else if (type === 'hit_wrong') {
+                playTone('sawtooth', 200, 80, 0.3, 0.4);
+            }
             else if (type === 'slash') playTone('sawtooth', 800, 80, 0.25, 0.4);
             else if (type === 'chest') playTone('sine', 300, 600, 0.3, 0.3);
             else if (type === 'victory') {
@@ -541,10 +592,10 @@
             }
         }
 
-        function handleImageFallback(imgEl, fallbackText) {
+        function handleImageFallback(imgEl, fallbackSvgData) {
             imgEl.onerror = function() {
                 this.onerror = null;
-                this.src = `https://placehold.co/300x420/181328/d4af37?text=${encodeURIComponent(fallbackText)}`;
+                this.src = fallbackSvgData;
             };
         }
 
@@ -632,8 +683,8 @@
             battleTurn = 1;
 
             const maouImgEl = document.getElementById('maou-img');
+            handleImageFallback(maouImgEl, getMaouSvg(currentMaou));
             maouImgEl.src = currentMaou.img;
-            handleImageFallback(maouImgEl, currentMaou.name);
 
             document.getElementById('maou-name').textContent = currentMaou.name;
             document.getElementById('maou-title').textContent = `${currentMaou.title} 【特性: ${currentMaou.trait}】`;
@@ -713,7 +764,14 @@
             if (isProcessingAction) return;
             isProcessingAction = true;
 
-            playSound('attack');
+            // 選択時の音と画面シェイク・フラッシュの演出を発動
+            if (isCorrect) {
+                playSound('hit_correct');
+            } else {
+                playSound('hit_wrong');
+            }
+            triggerShakeAndFlash();
+
             document.getElementById('choices-panel').classList.add('hidden');
 
             const rawDamage = isCorrect ? (Math.floor(Math.random() * 25) + 40) : (Math.floor(Math.random() * 10) + 10);
@@ -743,9 +801,26 @@
 
             setTimeout(() => {
                 document.getElementById('battle-msg').innerHTML += `<br><span class="text-red-400">${currentMaou.name}の反撃！ 勇者は ${counterDmg} のダメージを受けた！</span>`;
+                if (playerHp <= 0) {
+                    onPlayerDefeated();
+                    return;
+                }
                 document.getElementById('battle-menu').classList.remove('hidden');
                 isProcessingAction = false;
             }, 1000);
+        }
+
+        function onPlayerDefeated() {
+            isProcessingAction = true;
+            document.getElementById('battle-menu').classList.add('hidden');
+            document.getElementById('choices-panel').classList.add('hidden');
+            document.getElementById('gameover-modal').classList.remove('hidden');
+        }
+
+        function closeGameOver() {
+            document.getElementById('gameover-modal').classList.add('hidden');
+            isProcessingAction = false;
+            returnToTitle();
         }
 
         function runAway() {
@@ -871,10 +946,10 @@
             tropicalFishDB.forEach(fish => {
                 const isOwned = ownedIds.includes(fish.id);
                 const card = document.createElement('div');
-                card.className = `fantasy-panel p-1.5 flex flex-col items-center justify-center cursor-pointer transition-transform hover:scale-105 ${isOwned ? 'border-amber-400' : 'opacity-60 border-gray-700'}`;
+                card.className = `fantasy-panel p-1.5 flex flex-col items-center justify-center transition-transform hover:scale-105 ${isOwned ? 'border-amber-400 cursor-pointer' : 'opacity-60 border-gray-700'}`;
 
                 if (isOwned) {
-                    card.innerHTML = `<div class="w-full aspect-[3/4] rounded-lg overflow-hidden border border-amber-500/50 bg-black"><img src="${fish.img}" alt="${fish.name}" class="w-full h-full object-contain bg-black" id="col-img-${fish.id}"></div>`;
+                    card.innerHTML = `<div class="w-full aspect-[3/4] rounded-lg overflow-hidden border border-amber-500/50 bg-black flex items-center justify-center"><img src="${fish.img}" alt="${fish.name}" class="w-full h-full object-contain bg-black" id="col-img-${fish.id}"></div><span class="text-[10px] font-bold text-amber-200 mt-1 truncate w-full text-center">${fish.name}</span>`;
                     card.onclick = () => openModal(fish);
                 } else {
                     card.innerHTML = `<div class="w-full aspect-[3/4] rounded-lg bg-black/80 flex flex-col items-center justify-center border border-gray-800 text-gray-500"><span class="text-2xl mb-1">🔒</span><span class="text-[10px]">No.${fish.id}</span></div>`;
@@ -885,7 +960,9 @@
 
             tropicalFishDB.forEach(fish => {
                 const imgEl = document.getElementById(`col-img-${fish.id}`);
-                if (imgEl) handleImageFallback(imgEl, 'FISH CARD');
+                if (imgEl) {
+                    handleImageFallback(imgEl, getFishCardSvg(fish));
+                }
             });
 
             showScreen('screen-collection');
@@ -894,8 +971,8 @@
         function openModal(fish) {
             playSound('click');
             const modalImg = document.getElementById('modal-img');
+            handleImageFallback(modalImg, getFishCardSvg(fish));
             modalImg.src = fish.img;
-            handleImageFallback(modalImg, 'FISH CARD');
             document.getElementById('card-modal').classList.remove('hidden');
         }
 
@@ -924,10 +1001,16 @@
             }
         }
 
-        window.onload = function() {
+        function initApp() {
             createParticles();
             checkDailyStatus();
-        };
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
     </script>
 </body>
 </html>
