@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サンクスクエスト - Thanks Quest</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #0b0914;
+            color: #f3f4f6;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .game-screen-bg {
+            background: linear-gradient(to bottom, rgba(11, 9, 20, 0.45), rgba(11, 9, 20, 0.85)), url('bg_title.jpg') center/cover no-repeat;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 0 35px rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .fantasy-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        .fantasy-panel {
+            background: linear-gradient(135deg, rgba(20, 16, 38, 0.95) 0%, rgba(10, 8, 20, 0.98) 100%);
+            border: 2px solid #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+        }
+
+        .fantasy-btn {
+            background: linear-gradient(180deg, #3b2d54 0%, #1a1228 100%);
+            border: 1.5px solid #d4af37;
+            color: #fef08a;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+            will-change: transform;
+        }
+
+        .fantasy-btn:hover {
+            background: linear-gradient(180deg, #523e75 0%, #2a1e40 100%);
+            border-color: #fef08a;
+            box-shadow: 0 0 12px rgba(254, 240, 138, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .fantasy-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        #particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.8) 0%, rgba(212, 175, 55, 0) 70%);
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        .boss-glow {
+            filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+            animation: bossPulse 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes bossPulse {
+            0% { filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.4)); transform: scale(1); }
+            100% { filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.9)); transform: scale(1.02); }
+        }
+
+        .slash-effect-line {
+            position: absolute;
+            top: 50%;
+            left: -20%;
+            width: 140%;
+            height: 6px;
+            background: #ffffff;
+            box-shadow: 0 0 20px #60a5fa, 0 0 40px #3b82f6;
+            transform: rotate(-30deg) translateY(-50%);
+            animation: slashCut 0.3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            z-index: 50;
+        }
+
+        @keyframes slashCut {
+            0% { width: 0%; left: -20%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { width: 140%; left: -20%; opacity: 0; }
+        }
+
+        .sword-animation {
+            animation: swordSlash 0.5s ease-out forwards;
+        }
+
+        @keyframes swordSlash {
+            0% { transform: translate(-50%, -50%) rotate(45deg) scale(0.8); }
+            50% { transform: translate(-50%, -50%) rotate(-45deg) scale(1.4); }
+            100% { transform: translate(-50%, -50%) rotate(-45deg) scale(1); }
+        }
+
+        .shake-effect {
+            animation: screenShake 0.4s ease-in-out;
+        }
+
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-10px, 8px); }
+            40% { transform: translate(10px, -8px); }
+            60% { transform: translate(-6px, 4px); }
+            80% { transform: translate(6px, -4px); }
+        }
+
+        .flash-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: white;
+            z-index: 99;
+            pointer-events: none;
+            animation: flashFade 0.5s ease-out forwards;
+        }
+
+        @keyframes flashFade {
+            0% { opacity: 0.9; }
+            100% { opacity: 0; }
+        }
+
+        .cutin-particle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: expandParticle 8s cubic-bezier(0.1, 0.7, 0.2, 1) infinite;
+        }
+
+        @keyframes expandParticle {
+            0% {
+                width: 0px;
+                height: 0px;
+                opacity: 0.9;
+                background: radial-gradient(circle, rgba(254, 240, 138, 0.9) 0%, rgba(212, 175, 55, 0.4) 50%, rgba(0, 0, 0, 0) 70%);
+                box-shadow: 0 0 50px rgba(254, 240, 138, 0.8);
+            }
+            50% {
+                opacity: 0.85;
+            }
+            100% {
+                width: 1400px;
+                height: 1400px;
+                opacity: 0;
+                background: radial-gradient(circle, rgba(212, 175, 55, 0.6) 0%, rgba(180, 120, 20, 0.2) 60%, rgba(0, 0, 0, 0) 100%);
+                box-shadow: 0 0 120px rgba(212, 175, 55, 0.6);
+            }
+        }
+
+        .card-flip-anim {
+            animation: cardFlip 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes cardFlip {
+            0% { transform: scale(0.2) rotateY(90deg); opacity: 0; }
+            100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-2 md:p-4 relative">
+
+    <div id="particles-container"></div>
+
+    <main class="w-full max-w-4xl relative z-10 flex flex-col items-center">
+
+        <!-- TITLE SCREEN -->
+        <div id="screen-title" class="w-full flex flex-col items-center text-center space-y-6 py-8 game-screen-bg">
+            <div class="space-y-3">
+                <div class="inline-block px-4 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-widest uppercase">
+                    Reframing RPG
+                </div>
+                <h1 class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 fantasy-font drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] cursor-pointer" onclick="triggerSecretCommand()">
+                    サンクスクエスト
+                </h1>
+                <div class="px-3 py-1.5 rounded-lg bg-black/60 border border-amber-400/50 backdrop-blur-md shadow-[0_0_15px_rgba(212,175,55,0.3)] inline-block">
+                    <p class="text-xs md:text-sm font-bold text-amber-200 tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                        ✨ ポジティブな言葉に変換して魔王を倒せ！ ✨
+                    </p>
+                </div>
+            </div>
+
+            <div id="daily-status-badge" class="text-xs font-bold px-5 py-2.5 rounded-lg border">
+                確認中...
+            </div>
+
+            <div class="w-full max-w-xs space-y-3 pt-4">
+                <button onclick="startAdventure()" class="w-full fantasy-btn py-4 text-lg font-bold rounded-xl flex items-center justify-center space-x-2">
+                    <span>⚔️</span>
+                    <span>魔王に挑む</span>
+                </button>
+                <button onclick="openCollection()" class="w-full fantasy-btn py-3 text-base font-bold rounded-xl flex items-center justify-center space-x-2 border-amber-500/50">
+                    <span>📖</span>
+                    <span>コレクションブック</span>
+                </button>
+            </div>
+
+            <div class="pt-4">
+                <button onclick="toggleSound()" class="text-xs text-gray-400 hover:text-amber-300 flex items-center space-x-1 bg-black/40 px-3 py-1.5 rounded-full border border-gray-800">
+                    <span id="sound-icon">🔊</span>
+                    <span id="sound-text">サウンド: ON</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- LEAVING SCREEN -->
+        <div id="screen-leaving" class="w-full hidden flex-col items-center text-center space-y-6 py-12 game-screen-bg p-6">
+            <div class="text-5xl mb-2">🏠</div>
+            <h2 class="text-2xl font-bold text-amber-300">魔王は退勤しました</h2>
+            <p class="text-sm text-gray-300 max-w-md leading-relaxed">
+                本日のオフィスは平和に保たれました！<br>
+                魔王との戦いは1日1回までです。また明日お越しください！
+            </p>
+            <button onclick="returnToTitle()" class="fantasy-btn px-8 py-3 rounded-lg font-bold text-sm mt-4">
+                タイトルへ戻る
+            </button>
+        </div>
+
+        <!-- BATTLE SCREEN -->
+        <div id="screen-battle" class="w-full hidden flex-col space-y-4 game-screen-bg">
+            <div class="fantasy-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                <div class="shrink-0 flex items-center justify-center">
+                    <img id="maou-img" src="" alt="魔王" class="w-32 h-32 md:w-40 md:h-40 object-contain boss-glow drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]">
+                </div>
+
+                <div class="flex-1 space-y-2 text-left w-full">
+                    <div id="maou-title" class="inline-block text-[11px] md:text-xs font-bold text-red-300 bg-red-950/80 px-2.5 py-1 rounded border border-red-700/60">
+                        【特性: ???】
+                    </div>
+                    <h2 id="maou-name" class="text-2xl md:text-3xl font-black text-amber-300 font-serif tracking-wide">
+                        魔王名
+                    </h2>
+                    <p id="maou-quote" class="text-xs md:text-sm text-gray-300 italic bg-black/40 p-2 rounded border border-gray-800">
+                        「...」
+                    </p>
+                    <div class="space-y-1 pt-1">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-red-400">魔王 HP</span>
+                            <span id="maou-hp-text" class="text-amber-300">100 / 100</span>
+                        </div>
+                        <div class="w-full bg-black/80 h-3.5 rounded-full overflow-hidden border border-red-900/60">
+                            <div id="maou-hp-bar" class="bg-gradient-to-r from-red-600 via-amber-500 to-yellow-400 h-full transition-all duration-300" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-32 shrink-0 bg-black/60 border border-amber-500/40 rounded-lg p-2.5 flex flex-col justify-between space-y-2 text-center">
+                    <div class="border-b border-gray-800 pb-1">
+                        <span class="text-[10px] text-amber-400 font-bold block uppercase tracking-wider">HERO</span>
+                        <span class="text-xs font-bold text-gray-200">勇者ブレイブ</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-[10px] text-gray-400 block">HP</span>
+                        <span class="text-sm font-black text-green-400"><span id="player-hp">100</span>/100</span>
+                    </div>
+                    <div class="border-t border-gray-800 pt-1">
+                        <span class="text-[10px] text-gray-400 block">TURN</span>
+                        <span id="battle-turn" class="text-xs font-bold text-amber-300">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="battle-menu" class="fantasy-panel p-3.5 flex flex-row items-center gap-3">
+                <div class="flex flex-col gap-2 shrink-0">
+                    <button onclick="openAttackChoices()" class="fantasy-btn px-3 py-2 text-xs font-bold rounded-md flex items-center justify-center space-x-1 whitespace-nowrap min-w-[90px]">
+                        <span>⚔️</span>
+                        <span>たたかう</span>
+                    </button>
+                    <button onclick="runAway()" class="fantasy-btn px-3 py-2 text-xs font-bold rounded-md flex items-center justify-center space-x-1 whitespace-nowrap min-w-[90px] border-gray-600">
+                        <span>🏃</span>
+                        <span>にげる</span>
+                    </button>
+                </div>
+                <div id="battle-msg" class="flex-1 text-xs md:text-sm text-gray-200 bg-black/50 p-3 rounded-lg border border-amber-500/20 leading-relaxed">
+                    魔王が現れた！ネガティブな単語を前向きな言葉に変えて攻撃しよう！
+                </div>
+            </div>
+
+            <div id="choices-panel" class="fantasy-panel p-4 space-y-3 hidden">
+                <div class="bg-black/60 p-3 rounded-lg border border-amber-500/30 text-center space-y-2">
+                    <span class="text-xs font-bold text-red-400 block mb-1">【ネガティブ単語】</span>
+                    <p id="question-text" class="text-xl md:text-2xl font-black text-amber-300 tracking-wider">
+                        単語
+                    </p>
+                    <div class="pt-1 border-t border-amber-500/20">
+                        <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-200 border border-amber-400/60 rounded-full text-xs md:text-sm font-black tracking-wide shadow-[0_0_10px_rgba(251,191,36,0.3)] animate-pulse">
+                            ✨ 最も適したリフレーミング（ポジティブ変換）を選べ！ ✨
+                        </span>
+                    </div>
+                </div>
+                <div id="choices-container" class="grid grid-cols-1 md:grid-cols-3 gap-2.5"></div>
+            </div>
+        </div>
+
+        <!-- GACHA CUTIN SCREEN -->
+        <div id="screen-gacha" class="w-full hidden flex-col items-center justify-center min-h-[450px] relative game-screen-bg p-6 overflow-hidden">
+            <div id="slash-cut-phase" class="flex flex-col items-center space-y-6 text-center z-10">
+                <p class="text-2xl md:text-4xl font-black text-amber-300 tracking-wide drop-shadow-[0_2px_12px_rgba(212,175,55,0.8)]">
+                    ⚔️ 剣をタップしてカードをゲット！ ⚔️
+                </p>
+                <div onclick="executeSwordCut()" class="relative cursor-pointer p-8 group">
+                    <div id="slash-sword-icon" class="text-6xl md:text-8xl transition-transform group-hover:scale-110">
+                        ⚔️
+                    </div>
+                </div>
+            </div>
+
+            <div id="gacha-result-phase" class="w-full hidden flex-col items-center justify-center space-y-4 z-10">
+                <div id="gacha-cutin-stage" class="w-full flex flex-col items-center justify-center min-h-[320px] my-2 relative overflow-hidden rounded-2xl border-2 border-amber-500/50 bg-black"></div>
+
+                <div id="gacha-result-box" class="hidden flex-col items-center text-center space-y-1">
+                    <span id="gacha-card-rarity" class="text-xs font-bold text-amber-400"></span>
+                    <h3 id="gacha-card-name" class="text-lg md:text-xl font-black text-amber-200"></h3>
+                </div>
+
+                <div id="gacha-actions" class="hidden pt-2">
+                    <button onclick="openCollection()" class="fantasy-btn px-8 py-3 rounded-xl font-bold text-sm">
+                        コレクションブックを見る 📖
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLLECTION BOOK SCREEN -->
+        <div id="screen-collection" class="w-full hidden flex-col space-y-4 game-screen-bg">
+            <div class="fantasy-panel p-4 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-black text-amber-300">熱帯魚コレクション</h2>
+                    <p class="text-xs text-gray-400">コンプリート率: <span id="comp-rate" class="text-amber-400 font-bold">0</span>%</p>
+                </div>
+                <button onclick="returnToTitle()" class="fantasy-btn px-4 py-2 rounded-lg text-xs font-bold">
+                    タイトルへ戻る
+                </button>
+            </div>
+
+            <div id="cards-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 max-h-[60vh] overflow-y-auto p-1"></div>
+        </div>
+
+    </main>
+
+    <!-- VICTORY MODAL -->
+    <div id="victory-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+        <div class="fantasy-panel max-w-lg w-full p-6 text-center space-y-5 relative" onclick="event.stopPropagation()">
+            <div class="space-y-1">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">VICTORY</span>
+                <h3 class="text-2xl md:text-3xl font-black text-amber-300">魔王浄化完了！</h3>
+            </div>
+            
+            <div class="bg-black/60 p-4 rounded-xl border border-amber-500/30 text-left space-y-3">
+                <div class="flex items-center space-x-2 border-b border-gray-800 pb-2">
+                    <span class="text-xs text-gray-400 font-bold">お題ネガティブ：</span>
+                    <span id="victory-neg-word" class="text-base font-bold text-red-400"></span>
+                </div>
+                <div class="flex items-center space-x-2 border-b border-gray-800 pb-2">
+                    <span class="text-xs text-gray-400 font-bold">正解ポジティブ：</span>
+                    <span id="victory-pos-word" class="text-base font-bold text-green-400"></span>
+                </div>
+                <div class="pt-1">
+                    <span class="text-xs text-amber-300 font-bold block mb-1">💡 リフレーミングのポイント解説</span>
+                    <p id="victory-explanation" class="text-xs md:text-sm text-gray-300 leading-relaxed">
+                        短所やネガティブに思える要素も、視点を変えることで強みや個性として輝きます！
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="proceedToGacha()" class="w-full fantasy-btn py-3.5 rounded-xl font-bold text-base shadow-lg flex items-center justify-center space-x-2">
+                <span>🎁</span>
+                <span>カードガチャへ進む</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- CARD ENLARGED MODAL -->
+    <div id="card-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col items-center justify-center p-4" onclick="closeModal()">
+        <div class="relative max-w-md w-full flex flex-col items-center" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute -top-10 right-0 text-white text-2xl font-bold hover:text-amber-300">
+                ✕
+            </button>
+            <div class="w-full aspect-[3/4] max-h-[80vh] rounded-2xl overflow-hidden border-2 border-amber-400 shadow-[0_0_40px_rgba(212,175,55,0.6)] bg-black">
+                <img id="modal-img" src="" alt="Card" class="w-full h-full object-contain bg-black">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioCtx = null;
+        let audioEnabled = true;
+        let secretClickCount = 0;
+        let secretClickTimer = null;
+        let isProcessingAction = false;
+
+        let currentMaou = null;
+        let playerHp = 100;
+        let battleTurn = 1;
+        let currentProblem = null;
+        let windowRewardCardImg = '';
+
+        const maouList = [
+            { name: "魔導王ソーサラー", title: "虚無の魔導王", trait: "クリティカル魔法攻撃（被ダメージ大）", quote: "「虚無の果てを知るがいい…我が禁術に平伏せよ！」", img: "maou_1.png", maxHp: 80, def: 1.0, atkBonus: 15 },
+            { name: "炎魔王イフレイム", title: "灼熱の武神", trait: "猛炎（毎ターン高ダメージの炎反撃）", quote: "「我が熱意に耐えられるか？焦りこそが焦土を生む！」", img: "maou_2.png", maxHp: 110, def: 1.0, atkBonus: 10 },
+            { name: "冥王トライデント", title: "深淵の支配者", trait: "深淵の呪い（勇者の攻撃力を減衰）", quote: "「深淵の暗闇がお前の言葉を打ち消す…」", img: "maou_3.png", maxHp: 100, def: 0.75, atkBonus: 5 },
+            { name: "巌魔王コアガーディアン", title: "不動の鉄壁", trait: "超金剛壁（被ダメージを半減）", quote: "「私の完璧な防壁を破る言葉など存在しない！」", img: "maou_4.png", maxHp: 150, def: 0.5, atkBonus: 0 },
+            { name: "邪竜王トリプルヘドラス", title: "三頭の多重思考", trait: "3頭の連携攻撃（連続反撃ダメージ）", quote: "「グハハ！三頭の思考の前に隙などないわ！」", img: "maou_5.png", maxHp: 120, def: 0.85, atkBonus: 8 }
+        ];
+
+        const wordsDB = [
+            { negative: "頑固", positive: "意思が強い" }, { negative: "せっかち", positive: "行動的" }, { negative: "優柔不断", positive: "慎重" }, { negative: "飽きっぽい", positive: "好奇心旺盛" }, { negative: "神経質", positive: "細やか" },
+            { negative: "人見知り", positive: "一途" }, { negative: "大雑把", positive: "おおらか" }, { negative: "心配性", positive: "準備万全" }, { negative: "八方美人", positive: "協調性がある" }, { negative: "口下手", positive: "誠実" },
+            { negative: "面倒くさがり", positive: "効率化が得意" }, { negative: "理屈っぽい", positive: "論理的" }, { negative: "自己主張が弱い", positive: "謙虚" }, { negative: "消極的", positive: "観察力がある" }, { negative: "おせっかい", positive: "親切" },
+            { negative: "ケチ", positive: "節約家" }, { negative: "短気", positive: "情熱的" }, { negative: "ルーズ", positive: "寛容" }, { negative: "プライドが高い", positive: "向上心がある" }, { negative: "優しすぎる", positive: "思いやりがある" },
+            { negative: "マイペース", positive: "自分を持っている" }, { negative: "不器用", positive: "ひたむき" }, { negative: "要領が悪い", positive: "丁寧" }, { negative: "遠慮がち", positive: "配慮ができる" }, { negative: "緊張しやすい", positive: "真剣に取り組む" },
+            { negative: "頑固親父", positive: "頼りがいがある" }, { negative: "愚痴が多い", positive: "問題意識が高い" }, { negative: "弱気", positive: "安全第一" }, { negative: "見栄っ張り", positive: "目標が高い" }, { negative: "頑な", positive: "ブレない軸がある" },
+            { negative: "うるさい", positive: "活気がある" }, { negative: "地味", positive: "実直" }, { negative: "臆病", positive: "危機管理ができる" }, { negative: "出しゃばり", positive: "リーダーシップがある" }, { negative: "飽き症", positive: "フットワークが軽い" },
+            { negative: "意地張り", positive: "粘り強い" }, { negative: "おおざっぱ", positive: "器が大きい" }, { negative: "冷たい", positive: "冷静沈着" }, { negative: "怒りっぽい", positive: "正義感が強い" }, { negative: "生意気", positive: "自立心がある" },
+            { negative: "なれなれしい", positive: "フレンドリー" }, { negative: "おっちょこちょい", positive: "愛嬌がある" }, { negative: "暗い", positive: "思慮深い" }, { negative: "あきらめが悪い", positive: "最後までやり遂げる" }, { negative: "頑固者", positive: "信念の人" },
+            { negative: "嫉妬深い", positive: "向上心が高い" }, { negative: "調子がいい", positive: "臨機応変" }, { negative: "自己中", positive: "主体性がある" }, { negative: "八つ当たり", positive: "感情に素直" }, { negative: "引っ込み思案", positive: "聞き上手" },
+            { negative: "図々しい", positive: "交渉上手" }, { negative: "優柔不断さ", positive: "熟考できる" }, { negative: "不機嫌", positive: "嘘がつけない" }, { negative: "頼りない", positive: "守ってあげたくなる" }, { negative: "変わり者", positive: "独創的" },
+            { negative: "考えすぎる", positive: "深い洞察力がある" }, { negative: "流されやすい", positive: "柔軟性がある" }, { negative: "自慢が多い", positive: "自己肯定感が高い" }, { negative: "頑固一徹", positive: "職人気質" }, { negative: "悲観的", positive: "リスクマネジメントが得意" },
+            { negative: "のんびり", positive: "癒やし系" }, { negative: "無口", positive: "口が堅い" }, { negative: "愛想がない", positive: "硬派" }, { negative: "うっかり屋", positive: "親しみやすい" }, { negative: "無理をしがち", positive: "努力家" },
+            { negative: "気弱", positive: "穏やか" }, { negative: "優柔", positive: "平和主義" }, { negative: "疑い深い", positive: "検証力がある" }, { negative: "くどい", positive: "熱意がある" }, { negative: "あわてんぼう", positive: "エネルギーに満ちている" },
+            { negative: "不器用さ", positive: "誠実さの証" }, { negative: "お喋り", positive: "社交的" }, { negative: "自信過剰", positive: "堂々としている" }, { negative: "優しすぎ", positive: "包容力抜群" }, { negative: "大ざっぱさ", positive: "許容範囲が広い" },
+            { negative: "執着心が強い", positive: "とことん追求する" }, { negative: "独善的", positive: "信念が強い" }, { negative: "小心者", positive: "気配り上手" }, { negative: "頑なさ", positive: "芯がある" }, { negative: "冷淡", positive: "客観的思考ができる" },
+            { negative: "調子乗り", positive: "ムードメーカー" }, { negative: "愚痴っぽさ", positive: "感受性が鋭い" }, { negative: "鈍感", positive: "メンタルが強い" }, { negative: "不愛想", positive: "媚びない姿勢" }, { negative: "引っ込み思案さ", positive: "奥ゆかしい" }, { negative: "短気さ", positive: "レスポンスが早い" }, { negative: "目立ちたがり", positive: "自己表現が得意" }, { negative: "軽薄", positive: "明るくフットワークが軽い" }, { negative: "感情的", positive: "人間味にあふれる" }, { negative: "怠け者", positive: "エネルギーの充電上手" },
+            { negative: "見栄っぱり", positive: "美意識が高い" }, { negative: "頑固一筋", positive: "初志貫徹" }, { negative: "あつかましい", positive: "物おじしない" }, { negative: "人見知り気質", positive: "観察力がある" }, { negative: "おせっかい焼き", positive: "面倒見が良い" },
+            { negative: "ネガティブ", positive: "リスク管理のプロ" }, { negative: "完璧主義", positive: "品質が高い" }, { negative: "優柔気質", positive: "思慮深い" }, { negative: "不器用気質", positive: "嘘のない誠実さ" }
+        ];
+
+        const dummyPositivesPool = [
+            "感謝の心", "笑顔が素敵", "挑戦心がある", "未来志向", "前向き",
+            "ユーモアがある", "希望に満ちている", "温かい心", "包容力がある", "エネルギーに溢れる",
+            "感謝ができる", "努力を惜しまない", "素直", "誠実", "周りを明るくする",
+            "思いやりがある", "信念がある", "希望を与える", "協調性がある", "前進し続ける"
+        ];
+
+        const fishNames = [
+            "ネオンテトラ", "カクレクマノミ", "グッピー", "ディスカス", "アジアアロワナ",
+            "カージナルテトラ", "ベタ", "エンゼルフィッシュ", "コリドラス・パンダ", "アベニーパファー",
+            "ナンヨウハギ", "ミクロラスボラ・ハナビ", "ゴールデンハニードワーフグラミー", "コリドラス・ステルバイ", "フレームエンゼル",
+            "ポリプテルス・セネガルス", "スカーレットジェム", "ジャーマンラミレジィ", "マンダリンフィッシュ", "シルバーアロワナ",
+            "ラミーノーズ・テトラ", "ミッキーマウスプラティ", "オトシンクルス", "アカヒレ", "ブラックモーリー",
+            "ラスボラ・ヘテロモルファ", "チェリーバルブ", "デバスズメダイ", "ブッシープレコ", "グリーンネオンテトラ",
+            "ドワーフグラミー", "サイアミーズ・フライングフォックス", "アフリカン・ランプアイ", "クーリーローチ", "エンドラーズ・ライブベアラー",
+            "ラスボラ・エスペイ", "セルフィンプレコ", "コンゴーテトラ", "ディープレッドホタルテトラ", "シリキルリスズメダイ",
+            "ボララス・ブリジッタエ", "パールグラミー", "キイロハギ", "インパイクティス・ケリー", "アピストグラマ・カカトイデス",
+            "オスカー", "イエローヘッドジョーフィッシュ", "レッドテールキャットフィッシュ", "アーチャーフィッシュ", "ポリプテルス・エンドリケリー",
+            "コリドラス・アネウス", "コリドラス・パレアトス", "レッドワグプラティ", "グローライトテトラ", "ゼブラダニオ",
+            "バルーンモーリー", "ブラックネオンテトラ", "レッドファントムテトラ", "コリドラス・ピグミー", "プリステラ",
+            "スマトラ", "ブラックファントムテトラ", "レモンテトラ", "ソードテール", "ペンギンテトラ",
+            "ルリスズメダイ", "ピグミーグラミー", "シルバーチップ・テトラ", "オトシンネグロ", "ハマクマノミ",
+            "トーマシー", "ピラニア・ナッテリー", "ハタタテダイ", "グラスフィッシュ", "ブルーグラミー",
+            "ドワーフボーシャ", "チョコレートグラミー", "フロントーサ", "クダゴンベ", "テトラオーロ",
+            "ホワイトネオンテトラ", "バジス・バジス", "ニチリンダテハゼ", "ブラックゴースト", "ミスジチョウチョウウオ",
+            "ピクタスキャット", "ソメワケヤッコ", "レッドピーコックシクリッド", "パールダニオ", "オレンジグリッターダニオ",
+            "バンブルビーキャット", "フウライチョウチョウウオ", "ボララス・マキュラータ", "キッシンググラミー", "スポッテッドガー",
+            "エメラルドグリーンスパイニーイール", "トマトアネモネフィッシュ", "ヘッドアンドテールライトテトラ", "フロリダハマー"
+        ];
+
+        const tropicalFishDB = fishNames.map((name, index) => {
+            const id = index + 1;
+            let rarityStars = "★";
+            if (id <= 5) rarityStars = "★★★★★";
+            else if (id <= 15) rarityStars = "★★★★";
+            else if (id <= 40) rarityStars = "★★★";
+            else if (id <= 70) rarityStars = "★★";
+
+            return { id: id, name: name, rarity: rarityStars, img: `fish_${id}.jpg` };
+        });
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(type, startFreq, endFreq, duration, gainVal = 0.2) {
+            if (!audioEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const now = audioCtx.currentTime;
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(startFreq, now);
+                if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+                gain.gain.setValueAtTime(gainVal, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + duration);
+            } catch (e) {
+                console.warn("Audio Synthesizer Error:", e);
+            }
+        }
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            if (type === 'click') playTone('sine', 440, 880, 0.08, 0.1);
+            else if (type === 'attack') playTone('triangle', 150, 40, 0.2, 0.3);
+            else if (type === 'slash') playTone('sawtooth', 800, 80, 0.25, 0.4);
+            else if (type === 'chest') playTone('sine', 300, 600, 0.3, 0.3);
+            else if (type === 'victory') {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => setTimeout(() => playTone('sine', freq, null, 0.3, 0.2), idx * 150));
+            }
+        }
+
+        function handleImageFallback(imgEl, fallbackText) {
+            imgEl.onerror = function() {
+                this.onerror = null;
+                this.src = `https://placehold.co/300x420/181328/d4af37?text=${encodeURIComponent(fallbackText)}`;
+            };
+        }
+
+        function toggleSound() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('sound-icon').textContent = audioEnabled ? '🔊' : '🔇';
+            document.getElementById('sound-text').textContent = audioEnabled ? `サウンド: ON` : `サウンド: OFF`;
+            playSound('click');
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            container.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < 25; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 6 + 2;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}vw`;
+                p.style.animationDuration = `${Math.random() * 6 + 5}s`;
+                p.style.animationDelay = `${Math.random() * 5}s`;
+                fragment.appendChild(p);
+            }
+            container.appendChild(fragment);
+        }
+
+        function getTodayString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function checkDailyStatus() {
+            const today = getTodayString();
+            const clearedDate = localStorage.getItem('thanks_quest_cleared_date');
+            const badge = document.getElementById('daily-status-badge');
+            const ownedIds = JSON.parse(localStorage.getItem('thanks_quest_cards') || '[]');
+            const isCompleted = ownedIds.length >= tropicalFishDB.length;
+
+            if (isCompleted) {
+                badge.textContent = `✨ 全カードコンプリート！何度でも挑戦可能！`;
+                badge.className = "text-xs font-bold text-amber-300 bg-amber-950/70 border border-amber-400/80 px-5 py-2.5 rounded-lg shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse tracking-wider";
+                return false;
+            }
+
+            if (clearedDate === today) {
+                badge.textContent = `魔王は退勤しました（本日クリア済み）`;
+                badge.className = "text-xs font-bold text-amber-300 bg-amber-950/40 px-5 py-2.5 rounded-lg border border-amber-500/40 shadow-none animate-none";
+                return true;
+            } else {
+                badge.textContent = `魔王がオフィスに出勤中！`;
+                badge.className = "text-xs font-bold text-red-400 bg-red-950/70 border border-red-500/80 px-5 py-2.5 rounded-lg shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse tracking-wider";
+                return false;
+            }
+        }
+
+        function showScreen(screenId) {
+            playSound('click');
+            ['screen-title', 'screen-leaving', 'screen-battle', 'screen-gacha', 'screen-collection'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            });
+            const target = document.getElementById(screenId);
+            target.classList.remove('hidden');
+            target.classList.add('flex');
+        }
+
+        function returnToTitle() {
+            checkDailyStatus();
+            showScreen('screen-title');
+        }
+
+        function startAdventure() {
+            if (checkDailyStatus()) {
+                showScreen('screen-leaving');
+                return;
+            }
+
+            isProcessingAction = false;
+            currentMaou = { ...maouList[Math.floor(Math.random() * maouList.length)] };
+            currentMaou.hp = currentMaou.maxHp;
+            playerHp = 100;
+            battleTurn = 1;
+
+            const maouImgEl = document.getElementById('maou-img');
+            maouImgEl.src = currentMaou.img;
+            handleImageFallback(maouImgEl, currentMaou.name);
+
+            document.getElementById('maou-name').textContent = currentMaou.name;
+            document.getElementById('maou-title').textContent = `${currentMaou.title} 【特性: ${currentMaou.trait}】`;
+            document.getElementById('maou-quote').textContent = currentMaou.quote;
+            updateMaouHpBar();
+
+            document.getElementById('player-hp').textContent = playerHp;
+            document.getElementById('battle-turn').textContent = battleTurn;
+            document.getElementById('battle-msg').textContent = `${currentMaou.name}が現れた！ ${currentMaou.quote.replace(/「|」/g, '')} ネガティブな状況を適切なリフレーミングで打ち破れ！`;
+
+            document.getElementById('battle-menu').classList.remove('hidden');
+            document.getElementById('choices-panel').classList.add('hidden');
+
+            showScreen('screen-battle');
+            triggerShakeAndFlash();
+        }
+
+        function triggerShakeAndFlash() {
+            const battleScreen = document.getElementById('screen-battle');
+            battleScreen.classList.add('shake-effect');
+            
+            const flash = document.createElement('div');
+            flash.className = 'flash-overlay';
+            document.body.appendChild(flash);
+
+            setTimeout(() => {
+                battleScreen.classList.remove('shake-effect');
+                flash.remove();
+            }, 600);
+        }
+
+        function updateMaouHpBar() {
+            const pct = Math.max(0, (currentMaou.hp / currentMaou.maxHp) * 100);
+            document.getElementById('maou-hp-bar').style.width = `${pct}%`;
+            document.getElementById('maou-hp-text').textContent = `${currentMaou.hp} / ${currentMaou.maxHp}`;
+        }
+
+        function openAttackChoices() {
+            if (isProcessingAction) return;
+            isProcessingAction = true;
+
+            playSound('click');
+            document.getElementById('battle-menu').classList.add('hidden');
+            document.getElementById('choices-panel').classList.remove('hidden');
+
+            currentProblem = wordsDB[Math.floor(Math.random() * wordsDB.length)];
+            document.getElementById('question-text').textContent = `「${currentProblem.negative}」`;
+
+            const correctChoice = { text: currentProblem.positive, isCorrect: true };
+            const availableOtherPositives = wordsDB
+                .filter(w => w.negative !== currentProblem.negative)
+                .map(w => w.positive)
+                .concat(dummyPositivesPool);
+
+            const wrongChoices = availableOtherPositives.sort(() => Math.random() - 0.5).slice(0, 2).map(text => ({ text, isCorrect: false }));
+            const choices = [correctChoice, ...wrongChoices].sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+            container.style.pointerEvents = 'none';
+
+            choices.forEach((c) => {
+                const btn = document.createElement('button');
+                btn.className = 'fantasy-btn p-3 text-center text-xs md:text-sm transition-all flex flex-col items-center justify-center space-y-1 hover:border-amber-300';
+                btn.innerHTML = `<span class="text-amber-200 font-bold">✨ ${c.text}</span>`;
+                btn.onclick = () => handleChoice(c.isCorrect, c.text);
+                container.appendChild(btn);
+            });
+
+            setTimeout(() => {
+                container.style.pointerEvents = 'auto';
+                isProcessingAction = false;
+            }, 300);
+        }
+
+        function handleChoice(isCorrect, chosenWord) {
+            if (isProcessingAction) return;
+            isProcessingAction = true;
+
+            playSound('attack');
+            document.getElementById('choices-panel').classList.add('hidden');
+
+            const rawDamage = isCorrect ? (Math.floor(Math.random() * 25) + 40) : (Math.floor(Math.random() * 10) + 10);
+            const damage = Math.max(1, Math.floor(rawDamage * (currentMaou.def || 1.0)));
+            currentMaou.hp -= damage;
+
+            if (isCorrect) {
+                document.getElementById('battle-msg').innerHTML = `<span class="text-green-400 font-bold">✨ 【リフレーミング大成功！】</span> 「${currentProblem.negative}」に最も適した言葉「${chosenWord}」で見事撃ち破った！${currentMaou.name}に <span class="text-amber-300 font-bold">${damage}</span> の大ダメージ！`;
+            } else {
+                document.getElementById('battle-msg').innerHTML = `<span class="text-yellow-400 font-bold">💡 【少し効果があった！】</span> 「${chosenWord}」は前向きな言葉だが、「${currentProblem.negative}」のリフレーミングとしては少しズレている…！${currentMaou.name}に <span class="text-amber-300 font-bold">${damage}</span> のかすりダメージ！（正解は「${currentProblem.positive}」）`;
+            }
+
+            updateMaouHpBar();
+
+            if (currentMaou.hp <= 0) {
+                currentMaou.hp = 0;
+                setTimeout(onMaouDefeated, 1000);
+                return;
+            }
+
+            battleTurn++;
+            document.getElementById('battle-turn').textContent = battleTurn;
+
+            const counterDmg = Math.max(1, 10 + (currentMaou.atkBonus || 0));
+            playerHp = Math.max(0, playerHp - counterDmg);
+            document.getElementById('player-hp').textContent = playerHp;
+
+            setTimeout(() => {
+                document.getElementById('battle-msg').innerHTML += `<br><span class="text-red-400">${currentMaou.name}の反撃！ 勇者は ${counterDmg} のダメージを受けた！</span>`;
+                document.getElementById('battle-menu').classList.remove('hidden');
+                isProcessingAction = false;
+            }, 1000);
+        }
+
+        function runAway() {
+            if (isProcessingAction) return;
+            playSound('click');
+            document.getElementById('battle-msg').innerHTML = `<span class="text-amber-300 font-bold">🏃 「戦いから逃げ出し、一旦態勢を整えることにした…！」</span>`;
+            setTimeout(returnToTitle, 1500);
+        }
+
+        function onMaouDefeated() {
+            playSound('victory');
+            localStorage.setItem('thanks_quest_cleared_date', getTodayString());
+
+            document.getElementById('victory-neg-word').textContent = `「${currentProblem.negative}」`;
+            document.getElementById('victory-pos-word').textContent = `✨ ${currentProblem.positive}`;
+            document.getElementById('victory-explanation').textContent = `「${currentProblem.negative}」という一見ネガティブな側面も、見方を変えれば「${currentProblem.positive}」という素敵な才能や個性になります。日常生活でも前向きにリフレーミングしてみましょう！`;
+
+            document.getElementById('victory-modal').classList.remove('hidden');
+        }
+
+        function proceedToGacha() {
+            playSound('click');
+            document.getElementById('victory-modal').classList.add('hidden');
+
+            const ownedIds = JSON.parse(localStorage.getItem('thanks_quest_cards') || '[]');
+            const unownedFish = tropicalFishDB.filter(f => !ownedIds.includes(f.id));
+
+            if (unownedFish.length === 0) {
+                const msg = document.createElement('div');
+                msg.className = 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-amber-950/90 text-amber-200 border-2 border-amber-400 px-6 py-5 rounded-xl shadow-[0_0_30px_rgba(212,175,55,0.8)] z-50 font-bold text-center text-sm md:text-base animate-bounce';
+                msg.innerHTML = '🏆 全カードコンプリート済み！<br><span class="text-xs text-indigo-200 font-normal mt-1 block">タイトル画面へ戻ります</span>';
+                document.body.appendChild(msg);
+                setTimeout(() => { msg.remove(); returnToTitle(); }, 2200);
+                return;
+            }
+
+            const pool = unownedFish.flatMap(fish => Array(fish.id).fill(fish));
+            const rewardCard = pool[Math.floor(Math.random() * pool.length)];
+            
+            ownedIds.push(rewardCard.id);
+            localStorage.setItem('thanks_quest_cards', JSON.stringify(ownedIds));
+
+            document.getElementById('gacha-card-rarity').textContent = `レア度: ${rewardCard.rarity}`;
+            document.getElementById('gacha-card-name').textContent = rewardCard.name;
+            windowRewardCardImg = rewardCard.img;
+
+            document.getElementById('slash-cut-phase').classList.remove('hidden');
+            document.getElementById('slash-cut-phase').classList.add('flex');
+            document.getElementById('gacha-result-phase').classList.add('hidden');
+            document.getElementById('gacha-result-phase').classList.remove('flex');
+
+            showScreen('screen-gacha');
+        }
+
+        function executeSwordCut() {
+            playSound('slash');
+
+            const slashLine = document.createElement('div');
+            slashLine.className = 'slash-effect-line';
+            document.getElementById('screen-gacha').appendChild(slashLine);
+
+            const swordIcon = document.getElementById('slash-sword-icon');
+            swordIcon.classList.add('sword-animation');
+            triggerShakeAndFlash();
+
+            setTimeout(() => {
+                slashLine.remove();
+                swordIcon.classList.remove('sword-animation');
+
+                document.getElementById('slash-cut-phase').classList.add('hidden');
+                document.getElementById('slash-cut-phase').classList.remove('flex');
+                document.getElementById('gacha-result-phase').classList.remove('hidden');
+                document.getElementById('gacha-result-phase').classList.add('flex');
+
+                const stage = document.getElementById('gacha-cutin-stage');
+                const resultBox = document.getElementById('gacha-result-box');
+                const actions = document.getElementById('gacha-actions');
+
+                resultBox.classList.add('hidden');
+                resultBox.classList.remove('flex', 'card-flip-anim');
+                actions.classList.add('hidden');
+                actions.classList.remove('flex');
+
+                playSound('chest');
+                stage.innerHTML = `
+                    <div class="absolute inset-0 bg-black flex items-center justify-center overflow-hidden">
+                        <div class="cutin-particle border-amber-300"></div>
+                        <div class="cutin-particle border-yellow-200" style="animation-delay: 0.15s;"></div>
+                        <div class="cutin-particle border-amber-400" style="animation-delay: 0.3s;"></div>
+                        <div class="cutin-particle border-yellow-100" style="animation-delay: 0.45s;"></div>
+                        <div class="cutin-particle border-amber-200" style="animation-delay: 0.6s;"></div>
+                        <div class="cutin-particle border-yellow-300" style="animation-delay: 0.75s;"></div>
+                    </div>`;
+
+                setTimeout(() => {
+                    playSound('victory');
+                    stage.className = "w-full flex flex-col items-center justify-center min-h-[320px] my-2 relative overflow-hidden rounded-2xl border-2 border-amber-500/50 bg-black";
+                    stage.innerHTML = `
+                        <div class="relative z-10 w-48 h-64 md:w-56 md:h-76 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-[0_0_30px_rgba(212,175,55,0.6)] card-flip-anim flex items-center justify-center bg-black">
+                            <img src="${windowRewardCardImg}" class="w-full h-full object-contain bg-black" id="reward-fish-img">
+                        </div>
+                    `;
+                    handleImageFallback(document.getElementById('reward-fish-img'), 'FISH CARD');
+
+                    resultBox.classList.remove('hidden');
+                    resultBox.classList.add('flex', 'card-flip-anim');
+                    actions.classList.remove('hidden');
+                    actions.classList.add('flex');
+                }, 3000);
+
+            }, 650);
+        }
+
+        function openCollection() {
+            playSound('click');
+            const ownedIds = JSON.parse(localStorage.getItem('thanks_quest_cards') || '[]');
+            const grid = document.getElementById('cards-grid');
+            grid.innerHTML = '';
+
+            document.getElementById('comp-rate').textContent = Math.round((ownedIds.length / tropicalFishDB.length) * 100);
+
+            const fragment = document.createDocumentFragment();
+            tropicalFishDB.forEach(fish => {
+                const isOwned = ownedIds.includes(fish.id);
+                const card = document.createElement('div');
+                card.className = `fantasy-panel p-1.5 flex flex-col items-center justify-center cursor-pointer transition-transform hover:scale-105 ${isOwned ? 'border-amber-400' : 'opacity-60 border-gray-700'}`;
+
+                if (isOwned) {
+                    card.innerHTML = `<div class="w-full aspect-[3/4] rounded-lg overflow-hidden border border-amber-500/50 bg-black"><img src="${fish.img}" alt="${fish.name}" class="w-full h-full object-contain bg-black" id="col-img-${fish.id}"></div>`;
+                    card.onclick = () => openModal(fish);
+                } else {
+                    card.innerHTML = `<div class="w-full aspect-[3/4] rounded-lg bg-black/80 flex flex-col items-center justify-center border border-gray-800 text-gray-500"><span class="text-2xl mb-1">🔒</span><span class="text-[10px]">No.${fish.id}</span></div>`;
+                }
+                fragment.appendChild(card);
+            });
+            grid.appendChild(fragment);
+
+            tropicalFishDB.forEach(fish => {
+                const imgEl = document.getElementById(`col-img-${fish.id}`);
+                if (imgEl) handleImageFallback(imgEl, 'FISH CARD');
+            });
+
+            showScreen('screen-collection');
+        }
+
+        function openModal(fish) {
+            playSound('click');
+            const modalImg = document.getElementById('modal-img');
+            modalImg.src = fish.img;
+            handleImageFallback(modalImg, 'FISH CARD');
+            document.getElementById('card-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            playSound('click');
+            document.getElementById('card-modal').classList.add('hidden');
+        }
+
+        function triggerSecretCommand() {
+            secretClickCount++;
+            playSound('click');
+            clearTimeout(secretClickTimer);
+            secretClickTimer = setTimeout(() => { secretClickCount = 0; }, 2000);
+
+            if (secretClickCount >= 10) {
+                secretClickCount = 0;
+                localStorage.removeItem('thanks_quest_cleared_date');
+                playSound('victory');
+                checkDailyStatus();
+                
+                const msg = document.createElement('div');
+                msg.className = 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-amber-900/90 text-amber-200 border-2 border-amber-400 px-6 py-4 rounded-xl shadow-[0_0_30px_rgba(212,175,55,0.8)] z-50 font-bold text-center text-sm md:text-base animate-bounce';
+                msg.innerHTML = '✨ 【開発者リセット発動！】<br>本日のクリア実績をリセットしました！<br>何度でも魔王に挑めます！';
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 2500);
+            }
+        }
+
+        window.onload = function() {
+            createParticles();
+            checkDailyStatus();
+        };
+    </script>
+</body>
+</html>
