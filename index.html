@@ -27,26 +27,6 @@
             border: 1px solid rgba(212, 175, 55, 0.5);
             backdrop-filter: blur(2px);
         }
-        .card-visual-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-col: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1f1a3a 0%, #0d0a1a 100%);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-visual-placeholder::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
-        }
 
         .fantasy-font {
             font-family: 'Cinzel', serif;
@@ -470,25 +450,66 @@
         ];
 
         const wordsDB = [
-            { negative: "頑固", positive: "意思が強い" }, { negative: "せっかち", positive: "行動的" }, { negative: "優柔不断", positive: "慎重" }, { negative: "飽きっぽい", positive: "好奇心旺盛" }, { negative: "神経質", positive: "細やか" },
-            { negative: "人見知り", positive: "一途" }, { negative: "大雑把", positive: "おおらか" }, { negative: "心配性", positive: "準備万全" }, { negative: "八方美人", positive: "協調性がある" }, { negative: "口下手", positive: "誠実" },
-            { negative: "面倒くさがり", positive: "効率化が得意" }, { negative: "理屈っぽい", positive: "論理的" }, { negative: "自己主張が弱い", positive: "謙虚" }, { negative: "消極的", positive: "観察力がある" }, { negative: "おせっかい", positive: "親切" },
-            { negative: "ケチ", positive: "節約家" }, { negative: "短気", positive: "情熱的" }, { negative: "ルーズ", positive: "寛容" }, { negative: "プライドが高い", positive: "向上心がある" }, { negative: "優しすぎる", positive: "思いやりがある" },
-            { negative: "マイペース", positive: "自分を持っている" }, { negative: "不器用", positive: "ひたむき" }, { negative: "要領が悪い", positive: "丁寧" }, { negative: "遠慮がち", positive: "配慮ができる" }, { negative: "緊張しやすい", positive: "真剣に取り組む" },
-            { negative: "頑固親父", positive: "頼りがいがある" }, { negative: "愚痴が多い", positive: "問題意識が高い" }, { negative: "弱気", positive: "安全第一" }, { negative: "見栄っ張り", positive: "目標が高い" }, { negative: "頑な", positive: "ブレない軸がある" },
-            { negative: "うるさい", positive: "活気がある" }, { negative: "地味", positive: "実直" }, { negative: "臆病", positive: "危機管理ができる" }, { negative: "出しゃばり", positive: "リーダーシップがある" }, { negative: "飽き症", positive: "フットワークが軽い" },
-            { negative: "意地張り", positive: "粘り強い" }, { negative: "おおざっぱ", positive: "器が大きい" }, { negative: "冷たい", positive: "冷静沈着" }, { negative: "怒りっぽい", positive: "正義感が強い" }, { negative: "生意気", positive: "自立心がある" },
-            { negative: "なれなれしい", positive: "フレンドリー" }, { negative: "おっちょこちょい", positive: "愛嬌がある" }, { negative: "暗い", positive: "思慮深い" }, { negative: "あきらめが悪い", positive: "最後までやり遂げる" }, { negative: "頑固者", positive: "信念の人" },
-            { negative: "嫉妬深い", positive: "向上心が高い" }, { negative: "調子がいい", positive: "臨機応変" }, { negative: "自己中", positive: "主体性がある" }, { negative: "八つ当たり", positive: "感情に素直" }, { negative: "引っ込み思案", positive: "聞き上手" },
-            { negative: "図々しい", positive: "交渉上手" }, { negative: "優柔不断さ", positive: "熟考できる" }, { negative: "不機嫌", positive: "嘘がつけない" }, { negative: "頼りない", positive: "守ってあげたくなる" }, { negative: "変わり者", positive: "独創的" },
-            { negative: "考えすぎる", positive: "深い洞察力がある" }, { negative: "流されやすい", positive: "柔軟性がある" }, { negative: "自慢が多い", positive: "自己肯定感が高い" }, { negative: "頑固一徹", positive: "職人気質" }, { negative: "悲観的", positive: "リスクマネジメントが得意" },
-            { negative: "のんびり", positive: "癒やし系" }, { negative: "無口", positive: "口が堅い" }, { negative: "愛想がない", positive: "硬派" }, { negative: "うっかり屋", positive: "親しみやすい" }, { negative: "無理をしがち", positive: "努力家" },
-            { negative: "気弱", positive: "穏やか" }, { negative: "優柔", positive: "平和主義" }, { negative: "疑い深い", positive: "検証力がある" }, { negative: "くどい", positive: "熱意がある" }, { negative: "あわてんぼう", positive: "エネルギーに満ちている" },
-            { negative: "不器用さ", positive: "誠実さの証" }, { negative: "お喋り", positive: "社交的" }, { negative: "自信過剰", positive: "堂々としている" }, { negative: "優しすぎ", positive: "包容力抜群" }, { negative: "大ざっぱさ", positive: "許容範囲が広い" },
-            { negative: "執着心が強い", positive: "とことん追求する" }, { negative: "独善的", positive: "信念が強い" }, { negative: "小心者", positive: "気配り上手" }, { negative: "頑なさ", positive: "芯がある" }, { negative: "冷淡", positive: "客観的思考ができる" },
-            { negative: "調子乗り", positive: "ムードメーカー" }, { negative: "愚痴っぽさ", positive: "感受性が鋭い" }, { negative: "鈍感", positive: "メンタルが強い" }, { negative: "不愛想", positive: "媚びない姿勢" }, { negative: "引っ込み思案さ", positive: "奥ゆかしい" }, { negative: "短気さ", positive: "レスポンスが早い" }, { negative: "目立ちたがり", positive: "自己表現が得意" }, { negative: "軽薄", positive: "明るくフットワークが軽い" }, { negative: "感情的", positive: "人間味にあふれる" }, { negative: "怠け者", positive: "エネルギーの充電上手" },
-            { negative: "見栄っぱり", positive: "美意識が高い" }, { negative: "頑固一筋", positive: "初志貫徹" }, { negative: "あつかましい", positive: "物おじしない" }, { negative: "人見知り気質", positive: "観察力がある" }, { negative: "おせっかい焼き", positive: "面倒見が良い" },
-            { negative: "ネガティブ", positive: "リスク管理のプロ" }, { negative: "完璧主義", positive: "品質が高い" }, { negative: "優柔気質", positive: "思慮深い" }, { negative: "不器用気質", positive: "嘘のない誠実さ" }
+            { negative: "あきっぽい", positive: "好奇心旺盛" },
+            { negative: "あきらめが悪い", positive: "粘り強い" },
+            { negative: "甘えんぼう", positive: "人を頼るのが上手" },
+            { negative: "あわてんぼう", positive: "行動力がある" },
+            { negative: "あいまい", positive: "柔軟性がある" },
+            { negative: "いいかげん", positive: "おおらか" },
+            { negative: "意見が言えない", positive: "傾聴力がある" },
+            { negative: "意地っ張り", positive: "芯が強い" },
+            { negative: "いばる", positive: "堂々としている" },
+            { negative: "暗い", positive: "落ち着いている" },
+            { negative: "イライラしやすい", positive: "情熱的" },
+            { negative: "うるさい", positive: "エネルギッシュ" },
+            { negative: "運動嫌い", positive: "デスクワークが得意" },
+            { negative: "ウザい", positive: "積極的" },
+            { negative: "臆病", positive: "慎重" },
+            { negative: "おしゃべり", positive: "社交的" },
+            { negative: "おせっかい", positive: "面倒見が良い" },
+            { negative: "落ち込みやすい", positive: "反省ができる" },
+            { negative: "落ち着きがない", positive: "アクティブ" },
+            { negative: "おとなしい", positive: "穏やか" },
+            { negative: "行動が遅い", positive: "計画的・慎重" },
+            { negative: "オタクっぽい", positive: "探究心が強い" },
+            { negative: "かたい", positive: "誠実" },
+            { negative: "感情的", positive: "人情味がある" },
+            { negative: "気が散りやすい", positive: "視野が広い" },
+            { negative: "きつい、きびしい", positive: "客観的" },
+            { negative: "気持ちの切り替えが下手", positive: "一つのことに真剣" },
+            { negative: "気持ち悪い", positive: "個性的" },
+            { negative: "緊張しやすい", positive: "準備を怠らない" },
+            { negative: "空気が読めない", positive: "周りに流されない" },
+            { negative: "口が軽い", positive: "オープン" },
+            { negative: "計画性がない", positive: "臨機応変" },
+            { negative: "ケチ", positive: "堅実" },
+            { negative: "強引", positive: "推進力がある" },
+            { negative: "自己中心", positive: "自分の軸がある" },
+            { negative: "さみしがり", positive: "人との繋がりを大切にする" },
+            { negative: "知ったかぶり", positive: "吸収意欲がある" },
+            { negative: "自慢っぽい", positive: "自己肯定感が高い" },
+            { negative: "神経質", positive: "繊細・緻密" },
+            { negative: "嫉妬深い", positive: "負けず嫌い" },
+            { negative: "整理整頓が苦手", positive: "大雑把" },
+            { negative: "外面がいい", positive: "礼儀正しい" },
+            { negative: "そっけない", positive: "自立している" },
+            { negative: "だまされやすい", positive: "素直" },
+            { negative: "調子に乗りやすい", positive: "ムードメーカー" },
+            { negative: "生意気な", positive: "物怖じしない" },
+            { negative: "なまける", positive: "効率化を考えられる" },
+            { negative: "人付き合いが苦手", positive: "一人で集中できる" },
+            { negative: "人に流されやすい", positive: "協調性がある" },
+            { negative: "ひねくれている", positive: "独自の着眼点がある" },
+            { negative: "批判してしまう", positive: "分析力がある" },
+            { negative: "プライドが高い", positive: "プロ意識が高い" },
+            { negative: "勉強嫌い", positive: "実践派" },
+            { negative: "マイペース", positive: "安定感がある" },
+            { negative: "負けず嫌い", positive: "努力家" },
+            { negative: "真面目過ぎる", positive: "責任感が強い" },
+            { negative: "無謀な", positive: "勇敢" },
+            { negative: "目立ちたがり", positive: "自己表現が得意" },
+            { negative: "優柔不断", positive: "慎重に検討できる" },
+            { negative: "欲張り", positive: "意欲的" }
         ];
 
         const dummyPositivesPool = [
@@ -765,7 +786,6 @@
             if (isProcessingAction) return;
             isProcessingAction = true;
 
-            // 選択時の音と画面シェイク・フラッシュの演出を発動
             if (isCorrect) {
                 playSound('hit_correct');
             } else {
