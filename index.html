@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>サンクスクエスト - Thanks Quest</title>
+    <!-- Favicon (Sword Icon) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -76,12 +78,14 @@
             background: radial-gradient(circle, rgba(212, 175, 55, 0.8) 0%, rgba(212, 175, 55, 0) 70%);
             border-radius: 50%;
             animation: floatUp linear infinite;
+            filter: blur(1px);
         }
 
         @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            30% { opacity: 0.9; }
+            80% { opacity: 0.7; }
+            100% { transform: translateY(-15vh) scale(1.5); opacity: 0; }
         }
 
         .boss-glow {
@@ -196,7 +200,7 @@
     <main class="w-full max-w-4xl relative z-10 flex flex-col items-center">
 
         <!-- TITLE SCREEN -->
-        <div id="screen-title" class="w-full flex flex-col items-center text-center space-y-6 py-8 game-screen-bg">
+        <div id="screen-title" class="w-full flex flex-col items-center text-center space-y-6 py-8 game-screen-bg min-h-[480px] justify-center">
             <div class="space-y-3">
                 <div class="inline-block px-4 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-widest uppercase">
                     Reframing RPG
@@ -235,7 +239,7 @@
         </div>
 
         <!-- LEAVING SCREEN -->
-        <div id="screen-leaving" class="w-full hidden flex-col items-center text-center space-y-6 py-12 game-screen-bg p-6">
+        <div id="screen-leaving" class="w-full hidden flex-col items-center justify-center text-center space-y-6 py-8 game-screen-bg min-h-[480px]">
             <div class="text-5xl mb-2">🏠</div>
             <h2 class="text-2xl font-bold text-amber-300">魔王は退勤しました</h2>
             <p class="text-sm text-gray-300 max-w-md leading-relaxed">
@@ -248,8 +252,8 @@
         </div>
 
         <!-- BATTLE SCREEN -->
-        <div id="screen-battle" class="w-full hidden flex-col space-y-4 game-screen-bg">
-            <div class="fantasy-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden">
+        <div id="screen-battle" class="w-full hidden flex-col space-y-4 game-screen-bg min-h-[480px] justify-between">
+            <div class="fantasy-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden flex-1">
                 <div class="shrink-0 flex items-center justify-center">
                     <img id="maou-img" src="" alt="魔王" class="w-32 h-32 md:w-40 md:h-40 object-contain boss-glow drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]">
                 </div>
@@ -435,6 +439,9 @@
         let secretClickTimer = null;
         let isProcessingAction = false;
 
+        let bgmInterval = null;
+        let currentBgmTrack = null;
+
         let currentMaou = null;
         let playerHp = 100;
         let battleTurn = 1;
@@ -614,6 +621,76 @@
             }
         }
 
+        const NOTE_FREQ = {
+            C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
+            C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, FS4: 369.99, G4: 392.00, GS4: 415.30, A4: 440.00, AS4: 466.16, B4: 493.88,
+            C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, FS5: 739.99, G5: 783.99, A5: 880.00, B5: 987.77,
+            OFF: 0
+        };
+
+        const BGM_TRACKS = {
+            title: {
+                bpm: 110,
+                wave: 'triangle',
+                gain: 0.05,
+                notes: ['C4', 'E4', 'G4', 'B4', 'C5', 'B4', 'G4', 'E4', 'A3', 'C4', 'E4', 'G4', 'A4', 'G4', 'E4', 'C4', 'F3', 'A3', 'C4', 'E4', 'F4', 'E4', 'C4', 'A3', 'G3', 'B3', 'D4', 'F4', 'G4', 'F4', 'D4', 'B3']
+            },
+            battle: {
+                bpm: 140,
+                wave: 'sawtooth',
+                gain: 0.04,
+                notes: ['A3', 'A3', 'C4', 'A3', 'D4', 'A3', 'DS4', 'D4', 'A3', 'A3', 'G4', 'FS4', 'F4', 'E4', 'D4', 'C4', 'A3', 'C4', 'E4', 'A4', 'G4', 'E4', 'C4', 'A3', 'E4', 'DS4', 'D4', 'C4', 'B3', 'C4', 'B3', 'G3']
+            },
+            leaving: {
+                bpm: 75,
+                wave: 'sine',
+                gain: 0.06,
+                notes: ['C4', 'E4', 'G4', 'E4', 'B3', 'D4', 'G4', 'D4', 'A3', 'C4', 'E4', 'C4', 'F3', 'A3', 'C4', 'A3', 'F3', 'A3', 'C4', 'OFF', 'G3', 'B3', 'D4', 'OFF']
+            },
+            collection: {
+                bpm: 95,
+                wave: 'sine',
+                gain: 0.05,
+                notes: ['E4', 'G4', 'B4', 'E5', 'D5', 'B4', 'G4', 'D4', 'C4', 'E4', 'G4', 'C5', 'B4', 'G4', 'E4', 'C4', 'A3', 'C4', 'E4', 'A4', 'G4', 'E4', 'C4', 'A3', 'B3', 'D4', 'FS4', 'A4', 'G4', 'E4', 'D4', 'B3']
+            },
+            gacha: {
+                bpm: 135,
+                wave: 'triangle',
+                gain: 0.06,
+                notes: ['G4', 'C5', 'E5', 'G5', 'E5', 'C5', 'G4', 'E4', 'A4', 'C5', 'F5', 'A5', 'F5', 'C5', 'A4', 'F4', 'B4', 'D5', 'G5', 'B5', 'G5', 'D5', 'B4', 'G4', 'C5', 'E5', 'G5', 'C6', 'G5', 'E5', 'C5', 'OFF']
+            }
+        };
+
+        function startBGM(trackName) {
+            if (currentBgmTrack === trackName) return;
+            stopBGM();
+            currentBgmTrack = trackName;
+            if (!audioEnabled) return;
+
+            const track = BGM_TRACKS[trackName];
+            if (!track) return;
+
+            let step = 0;
+            const stepDuration = (60 / track.bpm) * 1000 / 2;
+
+            bgmInterval = setInterval(() => {
+                if (!audioEnabled) return;
+                const note = track.notes[step % track.notes.length];
+                if (note && note !== 'OFF' && NOTE_FREQ[note]) {
+                    playTone(track.wave, NOTE_FREQ[note], null, (stepDuration / 1000) * 0.8, track.gain);
+                }
+                step++;
+            }, stepDuration);
+        }
+
+        function stopBGM() {
+            if (bgmInterval) {
+                clearInterval(bgmInterval);
+                bgmInterval = null;
+            }
+            currentBgmTrack = null;
+        }
+
         function handleImageFallback(imgEl, fallbackSvgData) {
             imgEl.onerror = function() {
                 this.onerror = null;
@@ -625,6 +702,15 @@
             audioEnabled = !audioEnabled;
             document.getElementById('sound-icon').textContent = audioEnabled ? '🔊' : '🔇';
             document.getElementById('sound-text').textContent = audioEnabled ? `サウンド: ON` : `サウンド: OFF`;
+            if (audioEnabled) {
+                if (currentBgmTrack) {
+                    const activeTrack = currentBgmTrack;
+                    currentBgmTrack = null;
+                    startBGM(activeTrack);
+                }
+            } else {
+                stopBGM();
+            }
             playSound('click');
         }
 
@@ -632,15 +718,18 @@
             const container = document.getElementById('particles-container');
             container.innerHTML = '';
             const fragment = document.createDocumentFragment();
-            for (let i = 0; i < 25; i++) {
+            for (let i = 0; i < 35; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
-                const size = Math.random() * 6 + 2;
+                const size = Math.random() * 24 + 12;
+                const duration = Math.random() * 8 + 6;
                 p.style.width = `${size}px`;
                 p.style.height = `${size}px`;
                 p.style.left = `${Math.random() * 100}vw`;
-                p.style.animationDuration = `${Math.random() * 6 + 5}s`;
-                p.style.animationDelay = `${Math.random() * 5}s`;
+                
+                // 初期表示時に画面全域へ散らすため、ネガティブディレイ（既にアニメーションが途中で始まっている状態）を付与
+                p.style.animationDuration = `${duration}s`;
+                p.style.animationDelay = `-${Math.random() * duration}s`;
                 fragment.appendChild(p);
             }
             container.appendChild(fragment);
@@ -685,6 +774,12 @@
             const target = document.getElementById(screenId);
             target.classList.remove('hidden');
             target.classList.add('flex');
+
+            if (screenId === 'screen-title') startBGM('title');
+            else if (screenId === 'screen-battle') startBGM('battle');
+            else if (screenId === 'screen-leaving') startBGM('leaving');
+            else if (screenId === 'screen-collection') startBGM('collection');
+            else if (screenId === 'screen-gacha') startBGM('gacha');
         }
 
         function returnToTitle() {
@@ -1025,6 +1120,20 @@
         function initApp() {
             createParticles();
             checkDailyStatus();
+
+            // Enable audio context & play title BGM on first user interaction
+            const unlockAudio = () => {
+                initAudio();
+                if (currentBgmTrack === 'title') {
+                    startBGM('title');
+                }
+                window.removeEventListener('click', unlockAudio);
+                window.removeEventListener('touchstart', unlockAudio);
+            };
+            window.addEventListener('click', unlockAudio);
+            window.addEventListener('touchstart', unlockAudio);
+
+            startBGM('title');
         }
 
         if (document.readyState === 'loading') {
