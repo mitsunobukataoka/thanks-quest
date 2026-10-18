@@ -447,13 +447,14 @@
         let battleTurn = 1;
         let currentProblem = null;
         let windowRewardCardImg = '';
+        let unusedProblems = []; // 1回の戦闘で重複させないための問題プール
 
         const maouList = [
-            { name: "魔導王ソーサラー", title: "虚無の魔導王", trait: "クリティカル魔法攻撃（被ダメージ大）", quote: "「虚無の果てを知るがいい…我が禁術に平伏せよ！」", img: "maou_1.png", maxHp: 80, def: 1.0, atkBonus: 15 },
-            { name: "炎魔王イフレイム", title: "灼熱の武神", trait: "猛炎（毎ターン高ダメージの炎反撃）", quote: "「我が熱意に耐えられるか？焦りこそが焦土を生む！」", img: "maou_2.png", maxHp: 110, def: 1.0, atkBonus: 10 },
-            { name: "冥王トライデント", title: "深淵の支配者", trait: "深淵の呪い（勇者の攻撃力を減衰）", quote: "「深淵の暗闇がお前の言葉を打ち消す…」", img: "maou_3.png", maxHp: 100, def: 0.75, atkBonus: 5 },
+            { name: "魔導王ソーサラー", title: "虚無の魔導王", trait: "クリティカル魔法攻撃（被ダメージ大）", quote: "「虚無の果てを知るがいい…我が禁術に平伏せよ！」", img: "maou_1.png", maxHp: 100, def: 1.0, atkBonus: 15 },
+            { name: "炎魔王イフレイム", title: "灼熱の武神", trait: "猛炎（毎ターン高ダメージの炎反撃）", quote: "「我が熱意に耐えられるか？焦りこそが焦土を生む！」", img: "maou_2.png", maxHp: 130, def: 1.0, atkBonus: 10 },
+            { name: "冥王トライデント", title: "深淵の支配者", trait: "深淵の呪い（勇者の攻撃力を減衰）", quote: "「深淵の暗闇がお前の言葉を打ち消す…」", img: "maou_3.png", maxHp: 120, def: 0.75, atkBonus: 5 },
             { name: "巌魔王コアガーディアン", title: "不動の鉄壁", trait: "超金剛壁（被ダメージを半減）", quote: "「私の完璧な防壁を破る言葉など存在しない！」", img: "maou_4.png", maxHp: 150, def: 0.5, atkBonus: 0 },
-            { name: "邪竜王トリプルヘドラス", title: "三頭の多重思考", trait: "3頭の連携攻撃（連続反撃ダメージ）", quote: "「グハハ！三頭の思考の前に隙などないわ！」", img: "maou_5.png", maxHp: 120, def: 0.85, atkBonus: 8 }
+            { name: "邪竜王トリプルヘドラス", title: "三頭の多重思考", trait: "3頭の連携攻撃（連続反撃ダメージ）", quote: "「グハハ！三頭の思考の前に隙などないわ！」", img: "maou_5.png", maxHp: 140, def: 0.85, atkBonus: 15 }
         ];
 
         const wordsDB = [
@@ -799,6 +800,9 @@
             playerHp = 100;
             battleTurn = 1;
 
+            // 1回の戦闘用に問題をシャッフルして複製
+            unusedProblems = [...wordsDB].sort(() => Math.random() - 0.5);
+
             const maouImgEl = document.getElementById('maou-img');
             handleImageFallback(maouImgEl, getMaouSvg(currentMaou));
             maouImgEl.src = currentMaou.img;
@@ -847,7 +851,12 @@
             document.getElementById('battle-menu').classList.add('hidden');
             document.getElementById('choices-panel').classList.remove('hidden');
 
-            currentProblem = wordsDB[Math.floor(Math.random() * wordsDB.length)];
+            // 未使用の問題から1つ取り出し（なくなったら再度全問から補填）
+            if (unusedProblems.length === 0) {
+                unusedProblems = [...wordsDB].sort(() => Math.random() - 0.5);
+            }
+            currentProblem = unusedProblems.pop();
+
             document.getElementById('question-text').textContent = `「${currentProblem.negative}」`;
 
             const correctChoice = { text: currentProblem.positive, isCorrect: true };
