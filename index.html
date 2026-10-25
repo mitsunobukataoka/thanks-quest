@@ -421,12 +421,12 @@
     </div>
 
     <!-- CARD ENLARGED MODAL -->
-    <div id="card-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col items-center justify-center p-4" onclick="closeModal()">
-        <div class="relative max-w-md w-full flex flex-col items-center" onclick="event.stopPropagation()">
-            <button onclick="closeModal()" class="absolute -top-10 right-0 text-white text-2xl font-bold hover:text-amber-300">
+    <div id="card-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col items-center justify-center p-2 md:p-4" onclick="closeModal()">
+        <div class="relative h-[92vh] max-h-[92vh] aspect-[9/16] max-w-[95vw] flex flex-col items-center justify-center" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute -top-10 right-0 text-white text-2xl font-bold hover:text-amber-300 z-10">
                 ✕
             </button>
-            <div class="w-full aspect-[3/4] max-h-[80vh] rounded-2xl overflow-hidden border-2 border-amber-400 shadow-[0_0_40px_rgba(212,175,55,0.6)] bg-black">
+            <div class="w-full h-full rounded-2xl overflow-hidden border-2 border-amber-400 shadow-[0_0_40px_rgba(212,175,55,0.6)] bg-black">
                 <img id="modal-img" src="" alt="Card" class="w-full h-full object-contain bg-black">
             </div>
         </div>
@@ -564,7 +564,7 @@
         function getFishCardSvg(fish) {
             const colors = ['#f59e0b', '#3b82f6', '#ec4899', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4'];
             const color = colors[(fish.id - 1) % colors.length];
-            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="420" viewBox="0 0 300 420"><rect width="300" height="420" rx="16" fill="%230f0c1b"/><rect x="10" y="10" width="280" height="400" rx="12" fill="none" stroke="%23d4af37" stroke-width="2"/><circle cx="150" cy="160" r="80" fill="${encodeURIComponent(color)}" opacity="0.2"/><path d="M110 160 Q150 110 190 160 Q150 210 110 160 Z" fill="${encodeURIComponent(color)}"/><circle cx="170" cy="150" r="6" fill="%23ffffff"/><text x="150" y="280" font-family="sans-serif" font-weight="bold" font-size="20" fill="%23fef08a" text-anchor="middle">No.${fish.id} ${encodeURIComponent(fish.name)}</text><text x="150" y="315" font-family="sans-serif" font-size="16" fill="%23fbbf24" text-anchor="middle">${encodeURIComponent(fish.rarity)}</text></svg>`;
+            return `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="270" height="480" viewBox="0 0 270 480"><rect width="270" height="480" rx="16" fill="%230f0c1b"/><rect x="10" y="10" width="250" height="460" rx="12" fill="none" stroke="%23d4af37" stroke-width="2"/><circle cx="135" cy="190" r="75" fill="${encodeURIComponent(color)}" opacity="0.2"/><path d="M95 190 Q135 140 175 190 Q135 240 95 190 Z" fill="${encodeURIComponent(color)}"/><circle cx="155" cy="180" r="6" fill="%23ffffff"/><text x="135" y="320" font-family="sans-serif" font-weight="bold" font-size="18" fill="%23fef08a" text-anchor="middle">No.${fish.id} ${encodeURIComponent(fish.name)}</text><text x="135" y="355" font-family="sans-serif" font-size="16" fill="%23fbbf24" text-anchor="middle">${encodeURIComponent(fish.rarity)}</text></svg>`;
         }
 
         function getMaouSvg(maou) {
@@ -1044,7 +1044,7 @@
                     playSound('victory');
                     stage.className = "w-full flex flex-col items-center justify-center min-h-[320px] my-2 relative overflow-hidden rounded-2xl border-2 border-amber-500/50 bg-black";
                     stage.innerHTML = `
-                        <div class="relative z-10 w-48 h-64 md:w-56 md:h-76 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-[0_0_30px_rgba(212,175,55,0.6)] card-flip-anim flex items-center justify-center bg-black">
+                        <div class="relative z-10 aspect-[9/16] h-72 md:h-80 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-[0_0_30px_rgba(212,175,55,0.6)] card-flip-anim flex items-center justify-center bg-black">
                             <img src="${windowRewardCardImg}" class="w-full h-full object-contain bg-black" id="reward-fish-img">
                         </div>
                     `;
@@ -1074,10 +1074,10 @@
                 card.className = `fantasy-panel p-1.5 flex flex-col items-center justify-center transition-transform hover:scale-105 ${isOwned ? 'border-amber-400 cursor-pointer' : 'opacity-60 border-gray-700'}`;
 
                 if (isOwned) {
-                    card.innerHTML = `<div class="w-full aspect-[3/4] rounded-lg overflow-hidden border border-amber-500/50 bg-black flex items-center justify-center"><img src="${fish.img}" alt="${fish.name}" class="w-full h-full object-contain bg-black" id="col-img-${fish.id}"></div><span class="text-[10px] font-bold text-amber-200 mt-1 truncate w-full text-center">${fish.name}</span>`;
+                    card.innerHTML = `<div class="w-full aspect-[9/16] rounded-lg overflow-hidden border border-amber-500/50 bg-black flex items-center justify-center"><img src="${fish.img}" alt="${fish.name}" class="w-full h-full object-contain bg-black" id="col-img-${fish.id}"></div><span class="text-[10px] font-bold text-amber-200 mt-1 truncate w-full text-center">${fish.name}</span>`;
                     card.onclick = () => openModal(fish);
                 } else {
-                    card.innerHTML = `<div class="w-full aspect-[3/4] rounded-lg bg-black/80 flex flex-col items-center justify-center border border-gray-800 text-gray-500"><span class="text-2xl mb-1">🔒</span><span class="text-[10px]">No.${fish.id}</span></div>`;
+                    card.innerHTML = `<div class="w-full aspect-[9/16] rounded-lg bg-black/80 flex flex-col items-center justify-center border border-gray-800 text-gray-500"><span class="text-2xl mb-1">🔒</span><span class="text-[10px]">No.${fish.id}</span></div>`;
                 }
                 fragment.appendChild(card);
             });
